@@ -5,10 +5,13 @@ using ARM.Entities;
 using ARM.Entities.ViewModels;
 using AutoMapper;
 using Caliburn.Micro;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ARM.DesktopUI.ViewModels
 {
@@ -22,6 +25,10 @@ namespace ARM.DesktopUI.ViewModels
 
         private IMapper mapper;
 
+        private StatusInfoViewModel status;
+
+        private IWindowManager window;
+
         private BindingList<ProductDisplayModel> products;
 
         private int itemQuantity = 1;
@@ -34,17 +41,42 @@ namespace ARM.DesktopUI.ViewModels
 
         #endregion
 
-        public SalesViewModel(IApiHelper apiHelper, IConfigHelper configHelper, IMapper mapper)
+        public SalesViewModel(IApiHelper apiHelper, IConfigHelper configHelper, IMapper mapper, StatusInfoViewModel status, IWindowManager window)
         {
             this.apiHelper = apiHelper;
             this.configHelper = configHelper;
             this.mapper = mapper;
+            this.status = status;
+            this.window = window;
         }
 
         protected override async void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
-            await LoadProductsAsync();
+            try
+            {
+                await LoadProductsAsync();
+            }
+            catch (Exception ex)
+            {
+                dynamic settings = new ExpandoObject();
+                settings.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                settings.ResizeMode = ResizeMode.NoResize;
+                settings.Title = "System Error";
+
+                if (ex.Message == "Unauthorized")
+                {
+                    status.UpdateMessage("Unauthorized Access", "You do not have permission to interact with the Sales Form");
+                    window.ShowDialog(status, null, settings);
+                }
+                else
+                {
+                    status.UpdateMessage("Fatal Exception", ex.Message);
+                    window.ShowDialog(status, null, settings);
+                }
+
+                TryClose();
+            }
         }
 
         private async Task LoadProductsAsync()
