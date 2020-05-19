@@ -13,4 +13,8 @@
     <ProjectReference Include="..\ARM.Entities\ARM.Entities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Interface\" />
+  </ItemGroup>
+
 </Project>

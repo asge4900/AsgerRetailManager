@@ -23,5 +23,6 @@ namespace ARM.Repository
 
         public ISaleRepository Sale => new SaleRepository(_url);
 
+        public IUserEndpoint User => new UserEndpoint(_url);
     }
 }

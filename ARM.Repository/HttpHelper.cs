@@ -90,12 +90,7 @@ namespace ARM.Repository
 
                 var response = await client.PostAsJsonAsync(controller, body);            
 
-                if (response.IsSuccessStatusCode)
-                {
-                    //var result = await response.Content.ReadAsAsync<TResult>();
-                    //return result;
-                }
-                else
+                if (response.IsSuccessStatusCode == false)
                 {
                     throw new Exception(response.ReasonPhrase);
                 }

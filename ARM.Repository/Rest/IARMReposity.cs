@@ -13,5 +13,7 @@
         IProductRepository Product { get; }
 
         ISaleRepository Sale { get; }
+
+        IUserEndpoint User { get;  }
     }
 }
