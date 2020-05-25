@@ -13,6 +13,7 @@ using System.Windows;
 
 namespace ARM.DesktopUI.ViewModels
 {
+    // TODO: If not working check https://www.youtube.com/watch?v=qJyTzUozUHY&list=PLLWMQd6PeGY0bEMxObA6dtYXuJOGfxSPx&index=30
     public class UserDisplayViewModel : Screen
     {
         #region Fields
@@ -27,11 +28,17 @@ namespace ARM.DesktopUI.ViewModels
 
         private BindingList<UserModel> users;
 
-        //private int itemQuantity = 1;
+        private UserModel selectedUser;
 
-        //private ProductDisplayModel selectedProduct;
+        private string selectedUserName;
 
-        //private CartItemDisplayModel selectedCartItem;        
+        private BindingList<string> userRoles = new BindingList<string>();
+
+        private BindingList<string> availableRoles = new BindingList<string>();
+
+        private string selectedUserRole;
+
+        private string selectedAvailableRoles;
 
         #endregion
 
@@ -90,6 +97,100 @@ namespace ARM.DesktopUI.ViewModels
             }
         }
 
+        public UserModel SelectedUser
+        {
+            get => selectedUser;
+            set
+            {
+                selectedUser = value;
+                SelectedUserName = value.Email;
+                UserRoles = new BindingList<string>(value.Roles.Select(x => x.Value).ToList());
+                LoadRoles();
+                NotifyOfPropertyChange(() => SelectedUser);
+            }
+        }
+
+        public string SelectedUserName
+        {
+            get => selectedUserName;
+            set
+            {
+                selectedUserName = value;
+                NotifyOfPropertyChange(() => SelectedUserName);
+            }
+        }
+
+        public BindingList<string> UserRoles
+        {
+            get => userRoles;
+            set
+            {
+                userRoles = value;
+                NotifyOfPropertyChange(() => UserRoles);
+            }
+        }
+
+        public BindingList<string> AvailableRoles
+        {
+            get => availableRoles;
+            set
+            {
+                availableRoles = value;
+                NotifyOfPropertyChange(() => AvailableRoles);
+            }
+        }        
+
+        public string SelectedUserRole
+        {
+            get => selectedUserRole;
+            set
+            {
+                selectedUserRole = value;
+                NotifyOfPropertyChange(() => SelectedUserRole);
+            }
+        }
+
+        public string SelectedAvailableRoles
+        {
+            get => selectedAvailableRoles;
+            set
+            {
+                selectedAvailableRoles = value;
+                NotifyOfPropertyChange(() => SelectedAvailableRoles);
+            }
+        }
+
+
+
         #endregion
+
+        private async Task LoadRoles()
+        {
+            var roles = await apiHelper.Repository.User.GetRolesAsync();
+
+            foreach (var role in roles)
+            {
+                if (UserRoles.IndexOf(role.Value) < 0)
+                {
+                    AvailableRoles.Add(role.Value);
+                }
+            }
+        }
+
+        public async Task AddSelectedRole()
+        {
+            await apiHelper.Repository.User.AddToRole(SelectedUser.Id, SelectedAvailableRoles);
+
+            UserRoles.Add(SelectedAvailableRoles);
+            AvailableRoles.Remove(SelectedAvailableRoles);
+        }
+
+        public async Task RemoveSelectedRole()
+        {
+            await apiHelper.Repository.User.RemoveRole(SelectedUser.Id, SelectedUserRole);
+
+            AvailableRoles.Add(SelectedUserRole);
+            UserRoles.Remove(SelectedUserRole);
+        }
     }
 }
