@@ -1,16 +1,14 @@
-﻿using ARM.DataManager.Library.DataAccess;
+﻿using System.Collections.Generic;
+using ARM.DataManager.Library.DataAccess;
 using ARM.DataManager.Library.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
 
-namespace ARM.DataManager.Controllers
+namespace ARMApi.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     //[Authorize]
-    public class InventoryController : ApiController
+    public class InventoryController : ControllerBase
     {
         //[Authorize(Roles = "Manager, Admin")]
         public List<InventoryModel> Get()

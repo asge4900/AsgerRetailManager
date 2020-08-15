@@ -1,13 +1,18 @@
-﻿using ARM.DataManager.Library.DataAccess;
-using ARM.DataManager.Library.Models;
-using ARM.Entities.Models;
+﻿using System;
 using System.Collections.Generic;
-using System.Web.Http;
+using System.Linq;
+using System.Threading.Tasks;
+using ARM.DataManager.Library.DataAccess;
+using ARM.DataManager.Library.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-namespace ARM.DataManager.Controllers
+namespace ARMApi.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     //[Authorize]
-    public class SaleController : ApiController
+    public class SaleController : ControllerBase
     {
         //[Authorize(Roles = "Cashier")]
         public void Post(SaleModel sale)
