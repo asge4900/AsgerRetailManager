@@ -1,5 +1,6 @@
 ﻿using ARM.DataManager.Library.Models;
 using ARM.Entities.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,17 @@ namespace ARM.DataManager.Library.DataAccess
 {
     public class SaleData
     {
+        private readonly IConfiguration configuration;
+
+        public SaleData(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+
         public void SaveSale(SaleModel saleInfo, string cashierId)
         {
             List<SaleDetail> details = new List<SaleDetail>();
-            ProductData product = new ProductData();
+            ProductData product = new ProductData(configuration);
             var TaxRate = ConfigHelper.GetTaxRate()/100;
 
             foreach (var item in saleInfo.SaleDetails)
@@ -50,7 +58,7 @@ namespace ARM.DataManager.Library.DataAccess
 
             sale.Total = sale.SubTotal + sale.Tax;            
 
-            using (SqlDataAccess sql = new SqlDataAccess())
+            using (SqlDataAccess sql = new SqlDataAccess(configuration))
             {
                 try
                 {
@@ -76,7 +84,7 @@ namespace ARM.DataManager.Library.DataAccess
 
         public List<SaleReportModel> GetSaleReport()
         {
-            SqlDataAccess sql = new SqlDataAccess();
+            SqlDataAccess sql = new SqlDataAccess(configuration);
 
             var output = sql.LoadData<SaleReportModel, dynamic>("SaleReport", new { }, Constants.ARMDATA);
 

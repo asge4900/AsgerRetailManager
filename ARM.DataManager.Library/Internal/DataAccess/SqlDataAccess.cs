@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.SqlServer.Server;
 using System;
 using System.Collections.Generic;
@@ -14,15 +15,26 @@ namespace ARM.DataManager.Library
 {
     public class SqlDataAccess : IDisposable
     {
+        #region Fields
+
         private IDbConnection dbConnection;
 
         private IDbTransaction dbTransaction;
 
         private bool isClosed = false;
 
+        private readonly IConfiguration configuration; 
+
+        #endregion
+
+        public SqlDataAccess(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+
         public string GetConnectionString(string name)
         {
-            return ConfigurationManager.ConnectionStrings[name].ConnectionString;
+            return configuration.GetConnectionString(name);
         }
 
         public List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)

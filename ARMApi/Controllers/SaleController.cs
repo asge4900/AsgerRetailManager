@@ -6,6 +6,7 @@ using ARM.DataManager.Library.DataAccess;
 using ARM.DataManager.Library.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace ARMApi.Controllers
 {
@@ -14,10 +15,17 @@ namespace ARMApi.Controllers
     //[Authorize]
     public class SaleController : ControllerBase
     {
+        private readonly IConfiguration configuration;
+
+        public SaleController(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+
         //[Authorize(Roles = "Cashier")]
         public void Post(SaleModel sale)
         {
-            SaleData data = new SaleData();
+            SaleData data = new SaleData(configuration);
             string userId = "1";
             data.SaveSale(sale, userId);
         }
@@ -26,7 +34,7 @@ namespace ARMApi.Controllers
         [Route("GetSalesReport")]
         public List<SaleReportModel> GetSalesReport()
         {
-            SaleData data = new SaleData();
+            SaleData data = new SaleData(configuration);
             return data.GetSaleReport();
         }
     }
