@@ -2,6 +2,7 @@
 using ARM.DesktopUI.Library.Api;
 using Caliburn.Micro;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace ARM.DesktopUI.ViewModels
 {
@@ -65,7 +66,7 @@ namespace ARM.DesktopUI.ViewModels
         {
             //var result = await apiHelper.Repository.Login.AuthenticateAsync(UserName, Password);
 
-            @event.PublishOnUIThread(new LogOnEvent());
+            await @event.PublishOnUIThreadAsync(new LogOnEvent(), new CancellationToken());
         }
     }
 }

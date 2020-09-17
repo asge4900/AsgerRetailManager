@@ -23,7 +23,7 @@ namespace ARM.DesktopUI.ViewModels
 
         public void Close()
         {
-            TryClose();
+            TryCloseAsync();
         }
     }
 }

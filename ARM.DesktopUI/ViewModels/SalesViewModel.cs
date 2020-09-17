@@ -67,15 +67,17 @@ namespace ARM.DesktopUI.ViewModels
                 if (ex.Message == "Unauthorized")
                 {
                     status.UpdateMessage("Unauthorized Access", "You do not have permission to interact with the Sales Form");
-                    window.ShowDialog(status, null, settings);
+                    await window.ShowDialogAsync(status, null, settings);
                 }
                 else
                 {
                     status.UpdateMessage("Fatal Exception", ex.Message);
-                    window.ShowDialog(status, null, settings);
+                    await window.ShowDialogAsync(status, null, settings);
                 }
 
-                TryClose();
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                TryCloseAsync();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             }
         }
 

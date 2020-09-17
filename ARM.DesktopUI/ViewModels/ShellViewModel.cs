@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -19,9 +20,9 @@ namespace ARM.DesktopUI.ViewModels
             this.@event = @event;
             this.salesVM = salesVM;
 
-            this.@event.Subscribe(this);
+            this.@event.SubscribeOnPublishedThread(this);
 
-            ActivateItem(IoC.Get<LoginViewModel>());
+            ActivateItemAsync(IoC.Get<LoginViewModel>(), new CancellationToken());
         }
 
         public bool LoggedIn { get; set; } = false;
@@ -43,26 +44,35 @@ namespace ARM.DesktopUI.ViewModels
 
         public void ExitApplication()
         {
-            TryClose();
+            TryCloseAsync();
         }
 
-        public void UserManagement()
+        public async Task UserManagement()
         {
-            ActivateItem(IoC.Get<UserDisplayViewModel>());
+            await ActivateItemAsync(IoC.Get<UserDisplayViewModel>(), new CancellationToken());
         }
 
-        public void LogOut()
+        public async Task LogOut()
         {
-            ActivateItem(IoC.Get<LoginViewModel>());
+            await ActivateItemAsync(IoC.Get<LoginViewModel>(), new CancellationToken());
 
             LoggedIn = false;
 
             NotifyOfPropertyChange(() => IsLoggedIn);
         }
 
-        public void Handle(LogOnEvent message)
+        //public void Handle(LogOnEvent message)
+        //{
+        //    ActivateItem(salesVM);
+
+        //    LoggedIn = true;
+
+        //    NotifyOfPropertyChange(() => IsLoggedIn);
+        //}
+
+        public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
         {
-            ActivateItem(salesVM);
+            await ActivateItemAsync(salesVM, cancellationToken);
 
             LoggedIn = true;
 
