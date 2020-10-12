@@ -13,12 +13,10 @@ namespace ARM.DesktopUI.ViewModels
     public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>
     {
         private IEventAggregator @event;
-        private SalesViewModel salesVM;
 
-        public ShellViewModel(IEventAggregator @event, SalesViewModel salesVM)
+        public ShellViewModel(IEventAggregator @event)
         {            
             this.@event = @event;
-            this.salesVM = salesVM;
 
             this.@event.SubscribeOnPublishedThread(this);
 
@@ -59,20 +57,11 @@ namespace ARM.DesktopUI.ViewModels
             LoggedIn = false;
 
             NotifyOfPropertyChange(() => IsLoggedIn);
-        }
-
-        //public void Handle(LogOnEvent message)
-        //{
-        //    ActivateItem(salesVM);
-
-        //    LoggedIn = true;
-
-        //    NotifyOfPropertyChange(() => IsLoggedIn);
-        //}
+        }        
 
         public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
         {
-            await ActivateItemAsync(salesVM, cancellationToken);
+            await ActivateItemAsync(IoC.Get<SalesViewModel>(), cancellationToken);
 
             LoggedIn = true;
 
