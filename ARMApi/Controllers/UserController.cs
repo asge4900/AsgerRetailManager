@@ -18,13 +18,11 @@ namespace ARMApi.Controllers
     {
         private readonly ApplicationDbContext context;
         private readonly UserManager<IdentityUser> userManager;
-        private readonly IConfiguration configuration;
 
-        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IConfiguration configuration)
+        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IUserData userData)
         {
             this.context = context;
             this.userManager = userManager;
-            this.configuration = configuration;
         }
 
         [HttpGet]
@@ -32,9 +30,7 @@ namespace ARMApi.Controllers
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            UserData data = new UserData(configuration);
-
-            //return data.GetUserById(userId).First();
+            //return userData.GetUserById(userId).First();
         }
 
         //[Authorize(Roles = "Admin")]

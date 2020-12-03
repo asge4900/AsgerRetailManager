@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace ARM.DataManager.Library
 {
-    public class SqlDataAccess : IDisposable
+    public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
         #region Fields
 
@@ -23,7 +23,7 @@ namespace ARM.DataManager.Library
 
         private bool isClosed = false;
 
-        private readonly IConfiguration configuration; 
+        private readonly IConfiguration configuration;
 
         #endregion
 
@@ -91,7 +91,7 @@ namespace ARM.DataManager.Library
 
         public List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
         {
-            List<T> rows = dbConnection.Query<T>(storedProcedure, parameters, 
+            List<T> rows = dbConnection.Query<T>(storedProcedure, parameters,
                 commandType: CommandType.StoredProcedure, transaction: dbTransaction).ToList();
 
             return rows;

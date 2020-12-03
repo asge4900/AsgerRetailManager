@@ -9,20 +9,21 @@ using System.Threading.Tasks;
 
 namespace ARM.DataManager.Library.DataAccess
 {
-    public class SaleData
+    public class SaleData : ISaleData
     {
-        private readonly IConfiguration configuration;
+        private readonly IProductData productData;
+        private readonly ISqlDataAccess sql;
 
-        public SaleData(IConfiguration configuration)
+        public SaleData(IProductData productData, ISqlDataAccess sql)
         {
-            this.configuration = configuration;
+            this.productData = productData;
+            this.sql = sql;
         }
 
         public void SaveSale(SaleModel saleInfo, string cashierId)
         {
             List<SaleDetail> details = new List<SaleDetail>();
-            ProductData product = new ProductData(configuration);
-            var TaxRate = ConfigHelper.GetTaxRate()/100;
+            var TaxRate = ConfigHelper.GetTaxRate() / 100;
 
             foreach (var item in saleInfo.SaleDetails)
             {
@@ -32,7 +33,7 @@ namespace ARM.DataManager.Library.DataAccess
                     Quantity = item.Quantity
                 };
 
-                var productInfo = product.GetProductById(detail.ProductId);
+                var productInfo = productData.GetProductById(detail.ProductId);
 
                 if (productInfo == null)
                 {
@@ -47,7 +48,7 @@ namespace ARM.DataManager.Library.DataAccess
                 }
 
                 details.Add(detail);
-            }            
+            }
 
             Sale sale = new Sale
             {
@@ -56,36 +57,33 @@ namespace ARM.DataManager.Library.DataAccess
                 CashierId = cashierId
             };
 
-            sale.Total = sale.SubTotal + sale.Tax;            
+            sale.Total = sale.SubTotal + sale.Tax;
 
-            using (SqlDataAccess sql = new SqlDataAccess(configuration))
+
+            try
             {
-                try
+                sql.StartTransaction(Constants.ARMDATA);
+
+                sale.Id = sql.SaveAndLoadDataInTransaction<int, dynamic>("CreateSale", sale).FirstOrDefault();
+
+                foreach (var item in details)
                 {
-                    sql.StartTransaction(Constants.ARMDATA);
-
-                    sale.Id = sql.SaveAndLoadDataInTransaction<int, dynamic>("CreateSale", sale).FirstOrDefault();
-
-                    foreach (var item in details)
-                    {
-                        item.SaleId = sale.Id;
-                        sql.SaveDataInTransaction("CreateSaleDetail", item);
-                    }
-
-                    sql.CommitTransaction();
+                    item.SaleId = sale.Id;
+                    sql.SaveDataInTransaction("CreateSaleDetail", item);
                 }
-                catch
-                {
-                    sql.RollbackTransaction();
-                    throw;
-                }
+
+                sql.CommitTransaction();
             }
+            catch
+            {
+                sql.RollbackTransaction();
+                throw;
+            }
+
         }
 
         public List<SaleReportModel> GetSaleReport()
         {
-            SqlDataAccess sql = new SqlDataAccess(configuration);
-
             var output = sql.LoadData<SaleReportModel, dynamic>("SaleReport", new { }, Constants.ARMDATA);
 
             return output;

@@ -6,22 +6,18 @@ using System.Text;
 
 namespace ARM.DataManager.Library.DataAccess
 {
-    public class UserData
+    public class UserData : IUserData
     {
-        private readonly IConfiguration configuration;
+        private readonly ISqlDataAccess sql;
 
-        public UserData(IConfiguration configuration)
+        public UserData(ISqlDataAccess sql)
         {
-            this.configuration = configuration;
+            this.sql = sql;
         }
 
         public List<UserModel> GetUserById(string Id)
         {
-            SqlDataAccess sql = new SqlDataAccess(configuration);
-
-            var p = new { id = Id };
-
-            var output = sql.LoadData<UserModel, dynamic>("UserLookup", p, "ARMData");
+            var output = sql.LoadData<UserModel, dynamic>("UserLookup", new { Id }, "ARMData");
 
             return output;
         }

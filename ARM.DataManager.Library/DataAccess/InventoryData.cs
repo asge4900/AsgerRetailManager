@@ -8,18 +8,16 @@ using System.Threading.Tasks;
 
 namespace ARM.DataManager.Library.DataAccess
 {
-    public class InventoryData
-    {
-        private readonly IConfiguration configuration;
+    public class InventoryData : IInventoryData
+    {       
+        private readonly ISqlDataAccess sql;
 
-        public InventoryData(IConfiguration configuration)
+        public InventoryData(ISqlDataAccess sql)
         {
-            this.configuration = configuration;
+            this.sql = sql;
         }
         public List<InventoryModel> GetInventories()
         {
-            SqlDataAccess sql = new SqlDataAccess(configuration);
-
             var ouput = sql.LoadData<InventoryModel, dynamic>("GetAllInventories", new { }, Constants.ARMDATA);
 
             return ouput;
@@ -27,8 +25,6 @@ namespace ARM.DataManager.Library.DataAccess
 
         public void SaveInventoryRecord(InventoryModel item)
         {
-            SqlDataAccess sql = new SqlDataAccess(configuration);
-
             sql.SaveData("CreateInventory", item, Constants.ARMDATA);
         }
     }

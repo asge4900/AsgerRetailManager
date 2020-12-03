@@ -11,27 +11,25 @@ namespace ARMApi.Controllers
     //[Authorize]
     public class InventoryController : ControllerBase
     {
-        private readonly IConfiguration configuration;
+        private readonly IInventoryData inventoryData;
 
-        public InventoryController(IConfiguration configuration)
-        {
-            this.configuration = configuration;
+        public InventoryController(IInventoryData inventoryData)
+        {            
+            this.inventoryData = inventoryData;
         }
 
         //[Authorize(Roles = "Manager, Admin")]
         [HttpGet]
         public List<InventoryModel> Get()
         {
-            InventoryData data = new InventoryData(configuration);
-            return data.GetInventories();
+            return inventoryData.GetInventories();
         }
 
         //[Authorize(Roles = "Admin")]
         [HttpPost]
         public void Post(InventoryModel item)
         {
-            InventoryData data = new InventoryData(configuration);
-            data.SaveInventoryRecord(item);
+            inventoryData.SaveInventoryRecord(item);
         }
     }
 }

@@ -11,19 +11,18 @@ namespace ARMApi.Controllers
     //[Authorize (Roles = ("Cashier")]
     public class ProductController : ControllerBase
     {
-        private readonly IConfiguration configuration;
+        private readonly IProductData productData;
 
-        public ProductController(IConfiguration configuration)
+        public ProductController(IProductData productData)
         {
-            this.configuration = configuration;
+            this.productData = productData;
         }
 
         // GET api/Product
         [HttpGet]
         public List<ProductModel> Get()
         {
-            ProductData data = new ProductData(configuration);
-            return data.GetProducts();
+            return productData.GetProducts();
         }
     }
 }
