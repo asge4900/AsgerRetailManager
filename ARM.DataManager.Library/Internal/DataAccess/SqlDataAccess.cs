@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.SqlServer.Server;
 using System;
 using System.Collections.Generic;
@@ -24,12 +25,14 @@ namespace ARM.DataManager.Library
         private bool isClosed = false;
 
         private readonly IConfiguration configuration;
+        private readonly ILogger<SqlDataAccess> logger;
 
         #endregion
 
-        public SqlDataAccess(IConfiguration configuration)
+        public SqlDataAccess(IConfiguration configuration, ILogger<SqlDataAccess> logger)
         {
             this.configuration = configuration;
+            this.logger = logger;
         }
 
         public string GetConnectionString(string name)
@@ -129,9 +132,9 @@ namespace ARM.DataManager.Library
                 {
                     CommitTransaction();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Debug.WriteLine("Fail");
+                    logger.LogError(ex, "Commit transaction failed in the dispose method.");
                 }
             }
 

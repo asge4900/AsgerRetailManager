@@ -8,6 +8,7 @@ using ARMApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace ARMApi.Controllers
 {
@@ -18,11 +19,13 @@ namespace ARMApi.Controllers
     {
         private readonly ApplicationDbContext context;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly ILogger logger;
 
-        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IUserData userData)
+        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IUserData userData, ILogger logger)
         {
             this.context = context;
             this.userManager = userManager;
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -77,6 +80,9 @@ namespace ARMApi.Controllers
         [Route("Admin/AddRole")]
         public async Task AddRole(UserRolePairModel pairing)
         {
+            //string loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var loggedInUser = userData.GetUserById(loggedInUserId).First();
+
             var user = await userManager.FindByIdAsync(pairing.UserId);
             await userManager.AddToRoleAsync(user, pairing.RoleName);          
         }
@@ -86,6 +92,8 @@ namespace ARMApi.Controllers
         [Route("Admin/RemoveRole")]
         public async Task RemoveRole(UserRolePairModel pairing)
         {
+            //string loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
             var user = await userManager.FindByIdAsync(pairing.UserId);
             await userManager.RemoveFromRoleAsync(user, pairing.RoleName);
         }
